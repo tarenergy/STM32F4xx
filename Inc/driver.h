@@ -166,6 +166,8 @@
   #include "my_machine_map.h"
 #elif defined(BOARD_ROBIN_NANO_V30)
   #include "robin_nano_v30_map.h"
+#elif defined(BOARD_F401_BLACKPILL_PLOTTER)
+  #include "f401_blackpill_plotter_map.h"
 #else // default board
   #include "generic_map.h"
 #endif

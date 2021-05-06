@@ -1021,7 +1021,12 @@ void settings_changed (settings_t *settings)
 #if DRIVER_IRQMASK & 0xFC00
         HAL_NVIC_DisableIRQ(EXTI15_10_IRQn);
 #endif
-
+#ifdef CONTROL_PORT
+#define CONTROL_RESET_PORT CONTROL_PORT
+#define CONTROL_FEED_HOLD_PORT CONTROL_PORT
+#define CONTROL_CYCLE_START_PORT CONTROL_PORT
+#define CONTROL_SAFETY_DOOR_PORT CONTROL_PORT
+        #endif
         GPIO_Init.Pin = CONTROL_RESET_BIT;
         GPIO_Init.Mode = control_ire.reset ? GPIO_MODE_IT_RISING : GPIO_MODE_IT_FALLING;
         GPIO_Init.Pull = settings->control_disable_pullup.reset ? GPIO_NOPULL : GPIO_PULLUP;
