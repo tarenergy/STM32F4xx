@@ -296,7 +296,8 @@ static void stepperCyclesPerTick (uint32_t cycles_per_tick)
 // NOTE: step_outbits are: bit0 -> X, bit1 -> Y, bit2 -> Z...
 inline static __attribute__((always_inline)) void stepperSetStepOutputs (axes_signals_t step_outbits)
 {
-#if STEP_OUTMODE == GPIO_BITBAND
+
+	#if STEP_OUTMODE == GPIO_BITBAND
     step_outbits.mask ^= settings.steppers.step_invert.mask;
     BITBAND_PERI(X_STEP_PORT->ODR, X_STEP_PIN) = step_outbits.x;
     BITBAND_PERI(Y_STEP_PORT->ODR, Y_STEP_PIN) = step_outbits.y;
@@ -527,14 +528,14 @@ static control_signals_t systemGetState (void)
 
 #if CONTROL_INMODE == GPIO_BITBAND
 #if ESTOP_ENABLE
-    signals.e_stop = BITBAND_PERI(CONTROL_PORT->IDR, CONTROL_RESET_PIN);
+    signals.e_stop = BITBAND_PERI(CONTROL_RESET_PORT->IDR, CONTROL_RESET_PIN);
 #else
-    signals.reset = BITBAND_PERI(CONTROL_PORT->IDR, CONTROL_RESET_PIN);
+    signals.reset = BITBAND_PERI(CONTROL_RESET_PORT->IDR, CONTROL_RESET_PIN);
 #endif
-    signals.feed_hold = BITBAND_PERI(CONTROL_PORT->IDR, CONTROL_FEED_HOLD_PIN);
-    signals.cycle_start = BITBAND_PERI(CONTROL_PORT->IDR, CONTROL_CYCLE_START_PIN);
+    signals.feed_hold = BITBAND_PERI(CONTROL_FEED_HOLD_PORT->IDR, CONTROL_FEED_HOLD_PIN);
+    signals.cycle_start = BITBAND_PERI(CONTROL_CYCLE_START_PORT->IDR, CONTROL_CYCLE_START_PIN);
   #ifdef CONTROL_SAFETY_DOOR_PIN
-    signals.safety_door_ajar = BITBAND_PERI(CONTROL_PORT->IDR, CONTROL_SAFETY_DOOR_PIN);
+    signals.safety_door_ajar = BITBAND_PERI(CONTROL_SAFETY_DOOR_PORT->IDR, CONTROL_SAFETY_DOOR_PIN);
   #endif
 #elif CONTROL_INMODE == GPIO_MAP
     uint32_t bits = CONTROL_PORT->IDR;
@@ -1024,23 +1025,23 @@ void settings_changed (settings_t *settings)
         GPIO_Init.Pin = CONTROL_RESET_BIT;
         GPIO_Init.Mode = control_ire.reset ? GPIO_MODE_IT_RISING : GPIO_MODE_IT_FALLING;
         GPIO_Init.Pull = settings->control_disable_pullup.reset ? GPIO_NOPULL : GPIO_PULLUP;
-        HAL_GPIO_Init(CONTROL_PORT, &GPIO_Init);
+        HAL_GPIO_Init(CONTROL_RESET_PORT, &GPIO_Init);
 
         GPIO_Init.Pin = CONTROL_FEED_HOLD_BIT;
         GPIO_Init.Mode = control_ire.feed_hold ? GPIO_MODE_IT_RISING : GPIO_MODE_IT_FALLING;
         GPIO_Init.Pull = settings->control_disable_pullup.feed_hold ? GPIO_NOPULL : GPIO_PULLUP;
-        HAL_GPIO_Init(CONTROL_PORT, &GPIO_Init);
+        HAL_GPIO_Init(CONTROL_FEED_HOLD_PORT, &GPIO_Init);
 
         GPIO_Init.Pin = CONTROL_CYCLE_START_BIT;
         GPIO_Init.Mode = control_ire.cycle_start ? GPIO_MODE_IT_RISING : GPIO_MODE_IT_FALLING;
         GPIO_Init.Pull = settings->control_disable_pullup.cycle_start ? GPIO_NOPULL : GPIO_PULLUP;
-        HAL_GPIO_Init(CONTROL_PORT, &GPIO_Init);
+        HAL_GPIO_Init(CONTROL_CYCLE_START_PORT, &GPIO_Init);
 
 #ifdef CONTROL_SAFETY_DOOR_PIN
         GPIO_Init.Pin = CONTROL_SAFETY_DOOR_BIT;
         GPIO_Init.Mode = control_ire.safety_door_ajar ? GPIO_MODE_IT_RISING : GPIO_MODE_IT_FALLING;
         GPIO_Init.Pull = settings->control_disable_pullup.safety_door_ajar ? GPIO_NOPULL : GPIO_PULLUP;
-        HAL_GPIO_Init(CONTROL_PORT, &GPIO_Init);
+        HAL_GPIO_Init(CONTROL_SAFETY_DOOR_PORT, &GPIO_Init);
 #endif
 
         /***********************
